@@ -397,8 +397,10 @@
 	</cffunction>
 
 
-	<cffunction name="ancestor" returntype="any" access="public" output="false" hint="I return the parent of the current node.">
-		<cfreturn findOne(where="$getIdColumn=#this[$getParentColumn()]#")>
+	<cffunction name="parent" returntype="any" access="public" output="false" hint="I return the parent of the current node.">
+		<cfargument name="where" type="string" required="false" default="">
+		<cfset arguments.where = $createScopedWhere(arguments.where,"#$getIdColumn()# #$formatIdForQuery(this[$getParentColumn()])#")>
+		<cfreturn findOne(argumentCollection=arguments) />
 	</cffunction>
 	
 	
@@ -556,6 +558,7 @@
 		<cfreturn false>
 	</cffunction>
 	
+	
 	<cffunction name="moveToRightOf" returntype="boolean" access="public" output="false" mixin="model" hint="I move the current node to the right of the target node.">
 		<cfargument name="target" type="any" required="true" hint="I am either the id of a node or the node itself.">
 		<cfset arguments.target = $getObject(arguments.target)>
@@ -564,6 +567,7 @@
 		</cfif>
 		<cfreturn false>
 	</cffunction>
+	
 	
 	<cffunction name="moveToChildOf" returntype="boolean" access="public" output="false" mixin="model" hint="I move the current node underneath the target node.">
 		<cfargument name="target" type="any" required="true" hint="I am either the id of a node or the node itself.">
@@ -574,9 +578,11 @@
 		<cfreturn false>
 	</cffunction>
 	
+	
 	<cffunction name="moveToRoot" returntype="boolean" access="public" output="false" hint="I move the current node to the first root position.">
 		<cfreturn $moveTo("", "root") />
 	</cffunction>
+	
 	
 	<cffunction name="isMovePossible" returntype="boolean" access="public" output="false" hint="I check to see that the requested move is possible.">
 		<cfargument name="target" type="component" required="true" />
@@ -589,6 +595,7 @@
 			return true;
 		</cfscript>
 	</cffunction>
+	
 	
 	<cffunction name="toText" returntype="string" access="public" output="false">
 		<cfthrow type="Wheels.Plugins.NestedSet.NotImplemented" message="This method has not been implemented yet." />
@@ -604,6 +611,7 @@
 		<cfset variables.wheels.class.nestedSet.moveToNewParentId = hasChanged($getParentColumn()) />
 		<cfreturn true />
 	</cffunction>
+	
 	
 	<cffunction name="$moveToNewParent" returntype="boolean" access="public" output="false">
 		<cfscript>

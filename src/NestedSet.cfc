@@ -174,12 +174,12 @@
 			<cfif arguments.match>
 				<cfreturn "= #arguments.id#">
 			</cfif>
-			<cfreturn "!= #arguments.id#">
+			<cfreturn "<> #arguments.id#">
 		</cfif>
 		<cfif arguments.match>
 			<cfreturn "= '#arguments.id#'">
 		</cfif>
-		<cfreturn "!= '#arguments.id#'">
+		<cfreturn "<> '#arguments.id#'">
 	</cffunction>
 
 
@@ -429,7 +429,7 @@
 	<cffunction name="siblings" returntype="any" access="public" output="false" hint="I return the current node's siblings.">
 		<cfargument name="where" type="string" required="false" default="">
 		<cfargument name="order" type="string" required="false" default="#$getLeftColumn()# ASC">
-		<cfset arguments.where = $createScopedWhere(arguments.where,"#$getParentColumn()# #$formatIdForQuery(this[$getParentColumn()])# AND #$getIdColumn()# != 'e7ebe656-0f26-a649-beda-67036318c768'")>
+		<cfset arguments.where = $createScopedWhere(arguments.where,"#$getParentColumn()# #$formatIdForQuery(this[$getParentColumn()])# AND #$getIdColumn()# #$formatIdForQuery(this[$getIdColumn()],false)#")>
 		<cfreturn findAll(argumentCollection=arguments) />
 	</cffunction>
 	

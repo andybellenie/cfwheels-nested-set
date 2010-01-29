@@ -25,10 +25,12 @@
 	-------------------------------------------------------------------------------------
 	------------------------------------------------------------------------------------>	
 	
+	
 	<cffunction name="init" access="public" output="false" returntype="any">
 		<cfset this.version = "1.0,1.1" />
 		<cfreturn this />
 	</cffunction>
+
 
 	<cffunction name="nestedSet" returntype="void" access="public" output="false" mixin="model">
 		<cfargument name="idColumn" type="string" default="">
@@ -45,7 +47,7 @@
 			variables.wheels.class.nestedSet.isValidated = false;
 			// set callbacks
 			beforeValidationOnCreate(methods="$setDefaultLeftAndRight");
-			beforeSave(methods="$storeNewParent");
+			beforeSave(methods="$checkForNewParent");
 			afterSave(methods="$moveToNewParent");
 			beforeDelete(methods="$deleteDescendants");
 			// add in a calculated property for the leaf value
@@ -609,8 +611,8 @@
 	-------------------------------------------------------------------------------------
 	------------------------------------------------------------------------------------>
 	
-	<cffunction name="$storeNewParent" returntype="boolean" access="public" output="false">
-		<cfset variables.wheels.class.nestedSet.moveToNewParentId = hasChanged($getParentColumn()) />
+	<cffunction name="$checkForNewParent" returntype="boolean" access="public" output="false">
+		<cfset variables.wheels.class.nestedSet.moveToNewParent = hasChanged($getParentColumn()) />
 		<cfreturn true />
 	</cffunction>
 	
@@ -621,12 +623,12 @@
 			if (IsObject(parent)) {
 				if (not isSameScope(parent)) {			
 					$throw(type="Wheels.Plugins.NestedSet.ScopeMismatch",message="The supplied parent is not within the same scope as the item you are trying to insert.");
-				} else if (variables.wheels.class.nestedSet.moveToNewParentId) {
+				} else if (variables.wheels.class.nestedSet.moveToNewParent) {
 					moveToChildOf(parent);
 				}
 			}
 			// delete the instance variable
-			StructDelete(variables.wheels.class.nestedSet,"moveToNewParentId");
+			StructDelete(variables.wheels.class.nestedSet,"moveToNewParent");
 			// return true even if we did nothing as the node has already been inserted at root level
 			return true;
 		</cfscript>
@@ -852,7 +854,7 @@
 			if (IsObject(arguments.identifier))
 				return arguments.identifier;
 			else if ($idIsValid(arguments.identifier))
-				return findOne(where="#$getIdColumn()# = #$formatIdForQuery(arguments.identifier)#");
+				return findOne(where="#$getIdColumn()# #$formatIdForQuery(arguments.identifier)#");
 			else
 				return false;
 		</cfscript>

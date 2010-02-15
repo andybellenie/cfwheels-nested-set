@@ -27,7 +27,7 @@
 	
 	
 	<cffunction name="init" access="public" output="false" returntype="any">
-		<cfset this.version = "1.0,1.1" />
+		<cfset this.version = "1.1" />
 		<cfreturn this />
 	</cffunction>
 
@@ -454,6 +454,7 @@
 	
 	
 	<cffunction name="descendants" returntype="any" access="public" output="false" hint="I return the current node's descendants.">
+
 		<cfargument name="where" type="string" required="false" default="">
 		<cfargument name="order" type="string" required="false" default="#$getLeftColumn()# ASC">
 		<cfset arguments.where = $createScopedWhere(arguments.where,"#$getLeftColumn()# > #this[$getLeftColumn()]# AND #$getRightColumn()# < #this[$getRightColumn()]#")>
@@ -602,6 +603,7 @@
 	<cffunction name="toText" returntype="string" access="public" output="false">
 		<cfthrow type="Wheels.Plugins.NestedSet.NotImplemented" message="This method has not been implemented yet." />
 	</cffunction>
+
 	
 	
 	
@@ -624,6 +626,7 @@
 				if (not isSameScope(parent)) {			
 					$throw(type="Wheels.Plugins.NestedSet.ScopeMismatch",message="The supplied parent is not within the same scope as the item you are trying to insert.");
 				} else if (variables.wheels.class.nestedSet.moveToNewParent) {
+					$updatePersistedProperties();
 					moveToChildOf(parent);
 				}
 			}
@@ -634,7 +637,7 @@
 		</cfscript>
 	</cffunction>
 	
-	
+		
 	<cffunction name="$setDefaultLeftAndRight" returntype="void" access="public" output="false">
 		<cfscript>
 			this[$getLeftColumn()] = this.maximum(property=$getRightColumn(),reload=true);
@@ -673,7 +676,7 @@
 			UPDATE 	#tableName()#
 			SET 	  #$getLeftColumn()# = #$getLeftColumn()# - <cfqueryparam cfsqltype="cf_sql_integer" value="#loc.diff#">
 					, #$getRightColumn()# = #$getRightColumn()# - <cfqueryparam cfsqltype="cf_sql_integer" value="#loc.diff#">
-			WHERE	#$getLeftColumn()# > <cfqueryparam cfsqltype="cf_sql_integer" value="#this[$getRightColumn()]#">
+			WHERE	#$getRightColumn()# >= <cfqueryparam cfsqltype="cf_sql_integer" value="#this[$getRightColumn()]#">
 		</cfquery>
 		
 		<cfreturn true />
@@ -783,6 +786,7 @@
 			<cfscript>
 				if (IsObject(arguments.target))
 					arguments.target.reload();
+
 				this.reload();
 			</cfscript>
 			
